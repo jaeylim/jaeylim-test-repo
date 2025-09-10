@@ -1,4 +1,4 @@
-### Dockerfile example-1
+### Dockerfile example
 FROM python:3.11-slim
 
 # 앱 기준 디렉토리로 이동 (src 내에 app.py, config.py 등이 있음)

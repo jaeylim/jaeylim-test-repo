@@ -1,0 +1,23 @@
+# ---- 1) Build stage: Maven으로 WAR 빌드 (JDK 8) ----
+FROM maven:3.9.9-eclipse-temurin-8 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn -B -q -DskipTests dependency:go-offline
+COPY src ./src
+RUN mvn -B -DskipTests package
+# 결과 예: target/ROOT.war 또는 target/myapp.war
+
+# ---- 2) Runtime stage: Tomcat 9 + JDK 8 ----
+FROM tomcat:9.0-jdk8-temurin
+
+RUN useradd -r -u 10001 -g root tomcat && chown -R tomcat:root /usr/local/tomcat
+USER 10001
+
+ENV JAVA_TOOL_OPTIONS="-Xms512m -Xmx1024m -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Seoul"
+
+# 컨텍스트가 "/"면 ROOT.war로
+COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+# (컨텍스트가 "/myapp"이면 파일명을 myapp.war로 바꾸세요)
+
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
