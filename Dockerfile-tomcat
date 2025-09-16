@@ -1,5 +1,5 @@
 # ---- 1) Build stage: Maven으로 WAR 빌드 (JDK 8) ----
-FROM maven:3.9.9-eclipse-temurin-8 AS build
+FROM maven:3.8.6-jdk-8 AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn -B -q -DskipTests dependency:go-offline
