@@ -36,7 +36,7 @@ echo ""
 # 5. DocumentRoot 탐지
 echo "[INFO] Searching DocumentRoot..."
 
-DOCROOTS=$(grep -R "DocumentRoot" /etc/apache2 2>/dev/null | awk '{print $2}')
+DOCROOTS=$(grep -R "DocumentRoot" /etc/apache2 2>/dev/null | awk '{print $NF}')
 
 if [ -z "$DOCROOTS" ]; then
     echo "[WARN] No DocumentRoot found"
@@ -61,4 +61,4 @@ ss -ntlp | grep apache2
 
 echo ""
 
-echo "========== Apache Troubleshooting Checker Fin. =========="
+echo "========== Apache Troubleshooting Checker Complete =========="
