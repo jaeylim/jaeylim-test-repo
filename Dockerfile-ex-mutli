@@ -1,0 +1,30 @@
+# 1단계: 빌드 스테이지 (Build Stage)
+FROM maven:3.9.9-eclipse-temurin-17 AS build
+
+# 작업 디렉터리 설정
+WORKDIR /app
+
+# 의존성 캐시 최적화 (pom.xml만 먼저 복사)
+COPY pom.xml .
+RUN mvn -B -q -DskipTests dependency:go-offline
+
+# 소스 복사 및 빌드
+COPY src ./src
+RUN mvn -B -q clean package -DskipTests
+
+# 2단계: 런타임 스테이지 (Runtime Stage)
+FROM eclipse-temurin:17-jre
+
+# 비루트 사용자 생성 (보안 강화)
+RUN useradd -r -u 1001 appuser
+WORKDIR /app
+
+# 빌드 결과물만 복사 (불필요한 빌드툴 제외)
+COPY --from=build /app/target/*.jar app.jar
+
+# 파일 권한 부여 및 사용자 변경
+RUN chown appuser:appuser /app/app.jar
+USER appuser
+
+# 애플리케이션 실행 명령
+ENTRYPOINT ["java", "-jar", "app.jar"]
