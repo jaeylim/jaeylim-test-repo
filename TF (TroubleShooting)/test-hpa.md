@@ -88,4 +88,18 @@ tsc-test-hpa   Deployment/tsc-test-app   cpu: <unknown>/30%, memory: <unknown>/6
 tsc-test-hpa   Deployment/tsc-test-app   cpu: 200%/30%, memory: 66%/60%              1         3         1          16s
 ```
 
+### step3. OOMKilled 반복
+```
+kubectl set env deployment/tsc-test-app \
+  STRESS_OPTS="--vm 1 --vm-bytes 200M"   # 128Mi limit 초과 → OOMKilled 유도
 
+# 또는 직접 patch
+kubectl patch deployment tsc-test-app --type=json -p='[
+  {"op":"replace","path":"/spec/template/spec/containers/0/args",
+   "value":["--vm","1","--vm-bytes","200M","--cpu","1"]}
+]'
+
+# 재시작 카운트 확인
+kubectl get pods -w
+kubectl describe pod <pod-name> | grep -E "OOMKilled|Restart"
+```
