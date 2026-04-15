@@ -20,7 +20,7 @@
 
 set -euo pipefail
 
-# ── 색상 출력 ──────────────────────────────────────────────────────────────────
+# 색상 출력 
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
@@ -28,12 +28,12 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
-# ── 기본값 ─────────────────────────────────────────────────────────────────────
+# 기본값 
 NAMESPACE=""
 RESTART_THRESHOLD=3
 FOUND_ISSUE=false
 
-# ── 인자 파싱 ──────────────────────────────────────────────────────────────────
+# 인자 파싱
 while [[ $# -gt 0 ]]; do
   case $1 in
     --namespace|-n) NAMESPACE="$2"; shift 2 ;;
@@ -49,7 +49,7 @@ done
 NS_OPTS=""
 [[ -n "$NAMESPACE" ]] && NS_OPTS="-n $NAMESPACE" || NS_OPTS="--all-namespaces"
 
-# ── 헤더 출력 ──────────────────────────────────────────────────────────────────
+# 헤더 출력
 echo ""
 echo -e "${BOLD}${CYAN}================================================================${RESET}"
 echo -e "${BOLD}${CYAN}  TSC Scenario 1: OOMKilled 반복 + HPA 미작동 탐지${RESET}"
@@ -59,7 +59,7 @@ echo -e "  재시작 임계: ${RESTART_THRESHOLD}회 이상"
 echo -e "  실행 시각  : $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
-# ── 함수: kubectl 존재 확인 ────────────────────────────────────────────────────
+# 함수: kubectl 존재 확인
 check_kubectl() {
   if ! command -v kubectl &>/dev/null; then
     echo -e "${RED}[ERROR] kubectl 이 설치되어 있지 않습니다.${RESET}"
@@ -67,7 +67,7 @@ check_kubectl() {
   fi
 }
 
-# ── 함수: metrics-server 상태 확인 ────────────────────────────────────────────
+# 함수: metrics-server 상태 확인
 check_metrics_server() {
   local ms_status
   ms_status=$(kubectl get pods -n kube-system \
@@ -82,7 +82,7 @@ check_metrics_server() {
   echo "${ms_status:-NOT_FOUND}"
 }
 
-# ── 함수: HPA ScalingActive 조건 확인 ─────────────────────────────────────────
+# 함수: HPA ScalingActive 조건 확인 
 check_hpa_in_ns() {
   local ns="$1"
   local hpa_issues=()
@@ -116,7 +116,7 @@ check_hpa_in_ns() {
   printf '%s\n' "${hpa_issues[@]+"${hpa_issues[@]}"}"
 }
 
-# ── 메인 탐지 로직 ─────────────────────────────────────────────────────────────
+# 메인 탐지 로직 
 check_kubectl
 
 echo -e "${BOLD}[STEP 1] metrics-server 상태 확인${RESET}"
@@ -211,7 +211,7 @@ else
 fi
 echo ""
 
-# ── 최종 요약 ──────────────────────────────────────────────────────────────────
+# 최종 요약 
 echo -e "${BOLD}${CYAN}================================================================${RESET}"
 if $FOUND_ISSUE; then
   echo -e "${BOLD}${RED}  [RESULT] 복합 장애 감지됨 — 즉시 확인 필요${RESET}"
