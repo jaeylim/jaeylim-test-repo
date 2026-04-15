@@ -4,7 +4,7 @@ Kubernetes 운영 환경에서 발생하는 장애를 사전에 탐지하는 쉘
 • 실험 환경: NKS(Naver Kubernetes Service)
 • 버전: v1.32.6
 ---
-## 목적
+### 목적
 운영 환경에는 기본적인 알람이 설정되어 있지만, 다음과 같은 유형의 장애는 단일 메트릭 기반 알람으로 탐지하기 어렵다고 판단하여 본 스크립트를 작성하였습니다.
 
 - 두 가지 이상의 조건이 동시에 충족될 때 발생하는 복합 장애 
@@ -14,12 +14,12 @@ ex> OOMKilled 반복 + HPA 미작동 복합 장애
 
 이런 시나리오들을 쉘 스크립트로 진단 가능하게 제공합니다.
 ---
-## 전제 조건
+### 전제 조건
 • kubectl 설치 및 클러스터 접근 가능 (kubeconfig 설정)
 • `get`, `list` on pods, pvc, sa, rolebinding, hpa 등 권한있어야 함.
 • python3는 JSON 파싱 용도로 필요
 ---
-## 프로젝트 구조
+### 프로젝트 구조
 ```
 tsc/
 ├── README.md
@@ -28,14 +28,14 @@ tsc/
 └── 42-rbac-sa.sh            # RBAC 권한 누락 / ServiceAccount 오설정
 ```
 ---
-## 기본 시나리오와의 분리 기준
+### 기본 시나리오와의 분리 기준
 • 40: OOMKilled 반복 + HPA 미작동 복합
 • 41: PVC Pending 원인 분류 + SC 불일치
 • 42: RBAC 런타임 403 + SA 오설정
 ---
-## 시나리오 상세
+### 시나리오 상세
 
-### Scenario 1 — OOMKilled 반복 + HPA 미작동 복합 장애
+#### Scenario 1 — OOMKilled 반복 + HPA 미작동 복합 장애
 OOMKilled 1회 발생은 기본 알람으로 잡힐 수 있지만, 아래 조건이 동시에 성립하면 알람 없이 서비스가 지속적으로 재시작될 수 있습니다.
 
 - 특정 파드가 단시간 내 OOMKilled로 `N`회 이상 재시작
@@ -64,7 +64,7 @@ kubectl logs -n kube-system <metrics-server-pod>
 ```
 ---
 
-### Scenario 2 — PVC Pending + StorageClass 불일치 / Node Topology 충돌
+#### Scenario 2 — PVC Pending + StorageClass 불일치 / Node Topology 충돌
 PVC `Pending` 상태는 기본 탐지 가능하지만, Pending의 원인은 Events 로그를 파싱해야만 알 수 있습니다. 
 원인에 따라 조치 방법이 다르기 때문에 필요한 시나리오라고 생각이 되었습니다.
 
@@ -94,7 +94,7 @@ kubectl describe storageclass <sc-name>            # volumeBindingMode 확인
 ```
 ---
 
-### Scenario 3 — RBAC 권한 누락 / ServiceAccount(SA) 오설정 런타임 장애
+#### Scenario 3 — RBAC 권한 누락 / ServiceAccount(SA) 오설정 런타임 장애
 이미지 Pull도 성공하고, 파드도 `Running`인데 k8s API를 호출하는 순간 4XX이 발생할 수 있습니다. 
 이 장애는 파드 이벤트에는 나타나지 않으며, 앱 로그를 직접 확인하거나 RBAC 설정을 분석해야 발견될 수 있습니다.
 
@@ -132,15 +132,16 @@ kubectl get sa <sa-name> -n <namespace> -o yaml
 kubectl logs <pod-name> -n <namespace> | grep -i '403\|forbidden\|RBAC'
 ```
 ---
-## 실행 권한 설정
+#### 실행 권한 설정
 ```bash
 chmod +x 40-oomkilled-hpa.sh
 chmod +x 41-pvc-storageclass.sh
 chmod +x 42-rbac-sa.sh
 ```
 ---
-## CronJob으로 주기적 실행 (선택)
+#### CronJob으로 주기적 실행 (선택)
 클러스터 내에서 CronJob으로 돌리려면, 스크립트를 ConfigMap으로 마운트하거나 컨테이너 이미지에 포함해 다음과 같이 구성할 수 있습니다.
+```
 [yaml]
 ---
 apiVersion: batch/v1
@@ -169,8 +170,9 @@ spec:
           - name: scripts
             configMap:
               name: tsc-scripts
+```              
 ---
-## 출력 예시
+#### 출력 예시
 
 ```
 ================================================================
@@ -196,7 +198,6 @@ spec:
   [RESULT] 복합 장애 감지됨 — 즉시 확인 필요
 ================================================================
 ```
-
 ---
-## 라이선스
+#### 라이선스
 내부 프로젝트 / 팀 내 사용 목적으로 작성되었습니다.
