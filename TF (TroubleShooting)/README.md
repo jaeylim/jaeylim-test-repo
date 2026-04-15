@@ -28,6 +28,11 @@ tsc/
 └── 42-rbac-sa.sh            # RBAC 권한 누락 / ServiceAccount 오설정
 ```
 ---
+## 기본 시나리오와의 분리 기준
+• 40: OOMKilled 반복 + HPA 미작동 복합
+• 41: PVC Pending 원인 분류 + SC 불일치
+• 42: RBAC 런타임 403 + SA 오설정
+---
 ## 시나리오 상세
 
 ### Scenario 1 — OOMKilled 반복 + HPA 미작동 복합 장애
@@ -128,7 +133,6 @@ kubectl logs <pod-name> -n <namespace> | grep -i '403\|forbidden\|RBAC'
 ```
 ---
 ## 실행 권한 설정
-
 ```bash
 chmod +x 40-oomkilled-hpa.sh
 chmod +x 41-pvc-storageclass.sh
@@ -136,10 +140,9 @@ chmod +x 42-rbac-sa.sh
 ```
 ---
 ## CronJob으로 주기적 실행 (선택)
-
-클러스터 내에서 CronJob으로 돌리고 싶다면, 스크립트를 ConfigMap으로 마운트하거나 컨테이너 이미지에 포함해 다음과 같이 구성할 수 있습니다.
-
-```yaml
+클러스터 내에서 CronJob으로 돌리려면, 스크립트를 ConfigMap으로 마운트하거나 컨테이너 이미지에 포함해 다음과 같이 구성할 수 있습니다.
+[yaml]
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -157,7 +160,7 @@ spec:
             image: bitnami/kubectl:latest
             command:
             - /bin/bash
-            - /scripts/tsc-scenario1-oomkilled-hpa.sh
+            - /scripts/40-oomkilled-hpa.sh
             volumeMounts:
             - name: scripts
               mountPath: /scripts
@@ -166,24 +169,7 @@ spec:
           - name: scripts
             configMap:
               name: tsc-scripts
-```
-
 ---
-
-## 기본 시나리오와의 분리 기준
-
-| 구분 | 기본 시나리오 (타 팀원) | TSC 딥 시나리오 (본 프로젝트) |
-|------|------------------------|-------------------------------|
-| ImagePullBackOff | ✅ | — |
-| CrashLoopBackOff | ✅ | — |
-| OOMKilled 1회 | ✅ | — |
-| **OOMKilled 반복 + HPA 미작동 복합** | — | ✅ Scenario 1 |
-| PVC Pending (단순) | ✅ | — |
-| **PVC Pending 원인 분류 + SC 불일치** | — | ✅ Scenario 2 |
-| **RBAC 런타임 403 + SA 오설정** | — | ✅ Scenario 3 |
-
----
-
 ## 출력 예시
 
 ```
@@ -212,7 +198,5 @@ spec:
 ```
 
 ---
-
 ## 라이선스
-
 내부 프로젝트 / 팀 내 사용 목적으로 작성되었습니다.
