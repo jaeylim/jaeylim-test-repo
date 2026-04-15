@@ -104,4 +104,11 @@ kubectl get pods -n default -l app=tsc-test -w
 
 # OOMKilled 발생 확인 (2~3분 소요)
 kubectl describe pods -n default -l app=tsc-test | grep -E "OOMKilled|Restart Count"
+
+# 다시 메모리 부하 원복
+kubectl patch deployment tsc-test-app -n default --type=json -p='[
+  {"op":"replace",
+   "path":"/spec/template/spec/containers/0/args",
+   "value":["--vm","1","--vm-bytes","50M","--cpu","1"]}
+]'
 ```
