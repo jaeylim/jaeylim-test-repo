@@ -14,7 +14,7 @@
 #      metrics-server 파드가 Running 상태가 아님
 #
 # 사용법:
-#   ./tsc-scenario1-oomkilled-hpa.sh [--namespace <ns>] [--threshold <n>]
+#   ./40-oomkilled-hpa.sh [--namespace <ns>] [--threshold <n>]
 #   옵션 없을 시 전체 네임스페이스 대상, threshold=3
 # =============================================================================
 
