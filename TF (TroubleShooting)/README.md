@@ -24,21 +24,18 @@ tsc/
 ```
 ---
 ## 시나리오 상세
-### Scenario 1 — OOMKilled 반복 + HPA 미작동 복합 장애
 
-OOMKilled 1회 발생은 기본 알람으로 잡히지만, 아래 조건이 **동시에** 성립하면 알람 없이 서비스가 지속적으로 재시작됩니다.
+### Scenario 1 — OOMKilled 반복 + HPA 미작동 복합 장애
+OOMKilled 1회 발생은 기본 알람으로 잡힐 수 있지만, 아래 조건이 동시에 성립하면 알람 없이 서비스가 지속적으로 재시작될 수 있습니다.
 
 - 특정 파드가 단시간 내 OOMKilled로 `N`회 이상 재시작
 - HPA가 존재하지만 스케일 아웃을 못 하고 있음 (metrics-server 장애, maxReplicas 도달 등)
 
 **탐지 항목:**
-
-| 항목 | 설명 |
-|------|------|
-| `restartCount` 임계 초과 + `lastState.reason=OOMKilled` | 반복 OOM 파드 탐지 |
-| `metrics-server` pod Running 여부 | HPA 메트릭 수집 가능 여부 |
-| HPA `ScalingActive` condition 확인 | `FailedGetScale` 등 조건 탐지 |
-| HPA `currentReplicas >= maxReplicas` | 스케일 아웃 여지 없음 탐지 |
+1. `restartCount` 임계 초과 + `lastState.reason=OOMKilled` → 반복 OOM 파드 탐지
+2. `metrics-server` pod Running 여부 → HPA 메트릭 수집 가능 여부
+3. HPA `ScalingActive` condition 확인 → `FailedGetScale` 등 조건 탐지
+4. HPA `currentReplicas >= maxReplicas` → 스케일 아웃 여지 없음 탐지
 
 **실행 예시:**
 
