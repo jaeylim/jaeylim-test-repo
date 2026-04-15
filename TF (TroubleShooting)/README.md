@@ -1,8 +1,8 @@
 ## TSC (Trouble Shooting Checker) 스크립트
 Kubernetes 운영 환경에서 발생하는 장애를 사전에 탐지하는 쉘 스크립트 기반 진단 도구입니다.
 
-• 실험 환경: NKS(Naver Kubernetes Service)
-• 버전: v1.32.6
+- 실험 환경: NKS(Naver Kubernetes Service)
+- 버전: v1.32.6
 ---
 ### 목적
 운영 환경에는 기본적인 알람이 설정되어 있지만, 다음과 같은 유형의 장애는 단일 메트릭 기반 알람으로 탐지하기 어렵다고 판단하여 본 스크립트를 작성하였습니다.
