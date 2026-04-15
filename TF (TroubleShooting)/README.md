@@ -21,7 +21,7 @@ ex> OOMKilled 반복 + HPA 미작동 복합 장애
 ---
 ### 프로젝트 구조
 ```
-tsc/
+/root/tsc-test/scenarios
 ├── README.md
 ├── 40-oomkilled-hpa.sh      # OOMKilled 반복 + HPA 미작동 복합 장애
 ├── 41-pvc-storageclass.sh   # PVC Pending + StorageClass 불일치
