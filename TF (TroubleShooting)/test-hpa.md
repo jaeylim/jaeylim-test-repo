@@ -90,10 +90,7 @@ tsc-test-hpa   Deployment/tsc-test-app   cpu: 200%/30%, memory: 66%/60%         
 
 ### step3. OOMKilled 반복
 ```
-kubectl set env deployment/tsc-test-app -n default\
-  STRESS_OPTS="--vm 1 --vm-bytes 200M"   # 128Mi limit 초과 → OOMKilled 유도
-
-# 또는 직접 patch
+# 직접 memory patch
 kubectl patch deployment tsc-test-app -n default --type=json -p='[
   {"op":"replace","path":"/spec/template/spec/containers/0/args",
    "value":["--vm","1","--vm-bytes","200M","--cpu","1"]}
