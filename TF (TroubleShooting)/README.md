@@ -15,9 +15,9 @@ ex> OOMKilled 반복 + HPA 미작동 복합 장애
 이런 시나리오들을 쉘 스크립트로 진단 가능하게 제공합니다.
 ---
 ### 전제 조건
-• kubectl 설치 및 클러스터 접근 가능 (kubeconfig 설정)
-• `get`, `list` on pods, pvc, sa, rolebinding, hpa 등 권한있어야 함.
-• python3는 JSON 파싱 용도로 필요
+- kubectl 설치 및 클러스터 접근 가능 (kubeconfig 설정)
+- `get`, `list` on pods, pvc, sa, rolebinding, hpa 등 권한있어야 함.
+- python3는 JSON 파싱 용도로 필요
 ---
 ### 프로젝트 구조
 ```
@@ -29,9 +29,9 @@ tsc/
 ```
 ---
 ### 기본 시나리오와의 분리 기준
-• 40: OOMKilled 반복 + HPA 미작동 복합
-• 41: PVC Pending 원인 분류 + SC 불일치
-• 42: RBAC 런타임 403 + SA 오설정
+- 40: OOMKilled 반복 + HPA 미작동 복합
+- 41: PVC Pending 원인 분류 + SC 불일치
+- 42: RBAC 런타임 403 + SA 오설정
 ---
 ### 시나리오 상세
 
