@@ -8,9 +8,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
-    arn = event['SecretId']
-    token = event['ClientRequestToken']
-    step = event['Step']
+    arn = event['SecretId'] # 어떤 시크릿인지
+    token = event['ClientRequestToken'] # 이번 Rotation 고유 ID
+    step = event['Step'] #지금 몇 단계인지
 
     client = boto3.client('secretsmanager', region_name=os.environ.get('AWS_REGION', 'ap-northeast-2'))
 
