@@ -16,16 +16,16 @@ def lambda_handler(event, context):
 
     metadata = client.describe_secret(SecretId=arn)
     if not metadata['RotationEnabled']:
-        raise ValueError(f"Secret {arn} is not enabled for rotation")
+        raise ValueError("Secret {} is not enabled for rotation".format(arn))
 
     versions = metadata['VersionIdsToStages']
     if token not in versions:
-        raise ValueError(f"Secret version {token} has no stage for rotation of secret {arn}")
+        raise ValueError("Secret version {} has no stage for rotation of secret {}".format(token, arn))
     if 'AWSCURRENT' in versions[token]:
-        logger.info(f"Secret version {token} already set as AWSCURRENT for secret {arn}")
+        logger.info("Secret version {} already set as AWSCURRENT for secret {}".format(token, arn))
         return
     elif 'AWSPENDING' not in versions[token]:
-        raise ValueError(f"Secret version {token} not set as AWSPENDING for rotation of secret {arn}")
+        raise ValueError("Secret version {} not set as AWSPENDING for rotation of secret {}".format(token, arn))
 
     if step == 'createSecret':
         create_secret(client, arn, token)
@@ -36,12 +36,12 @@ def lambda_handler(event, context):
     elif step == 'finishSecret':
         finish_secret(client, arn, token)
     else:
-        raise ValueError(f"Invalid step parameter {step}")
+        raise ValueError("Invalid step parameter {}".format(step))
 
 def create_secret(client, arn, token):
     try:
         client.get_secret_value(SecretId=arn, VersionId=token, VersionStage='AWSPENDING')
-        logger.info(f"createSecret: Successfully retrieved secret for {arn}")
+        logger.info("createSecret: Successfully retrieved secret for {}".format(arn))
     except client.exceptions.ResourceNotFoundException:
         current = get_secret_dict(client, arn, 'AWSCURRENT')
         passwd = client.get_random_password(ExcludeCharacters='/@"\'\\')['RandomPassword']
@@ -57,10 +57,10 @@ def set_secret(client, arn, token):
     pending = get_secret_dict(client, arn, 'AWSPENDING', token)
     conn = get_connection(current)
     if not conn:
-        raise ValueError(f"Unable to connect to DB with current credentials for {arn}")
+        raise ValueError("Unable to connect to DB with current credentials for {}".format(arn))
     try:
         with conn.cursor() as cur:
-            cur.execute(f"ALTER USER '{pending['username']}'@'%' IDENTIFIED BY '{pending['password']}'")
+            cur.execute("ALTER USER '{}'@'%' IDENTIFIED BY '{}'".format(pending['username'], pending['password']))
         conn.commit()
     finally:
         conn.close()
@@ -69,7 +69,7 @@ def test_secret(client, arn, token):
     pending = get_secret_dict(client, arn, 'AWSPENDING', token)
     conn = get_connection(pending)
     if not conn:
-        raise ValueError(f"Unable to connect to DB with pending credentials for {arn}")
+        raise ValueError("Unable to connect to DB with pending credentials for {}".format(arn))
     conn.close()
 
 def finish_secret(client, arn, token):
@@ -98,5 +98,5 @@ def get_connection(secret_dict):
             connect_timeout=5
         )
     except Exception as e:
-        logger.error(f"Connection failed: {e}")
+        logger.error("Connection failed: {}".format(e))
         return None
