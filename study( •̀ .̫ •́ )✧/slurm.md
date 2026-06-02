@@ -40,7 +40,6 @@ EX> sbatch job.sh
 python train.py                # 실제 실행할 명령어
 ```
 
-
 ##### Kubernetes와 차이점
 🗒️ Kube와 차이점은 작업 단위 `Kubernetes (Pod), Slurm(Job)`외에도 다음과 같다.
 
@@ -65,6 +64,33 @@ Kubernetes  →  학습 완료된 모델 서빙
 ├── debug 파티션    → 노드 5개, 짧은 테스트용
 └── long 파티션     → 노드 15개, 장기 실행 job용
 ```
+
+##### slurm test
+[순서]: 공통 설정 → Control 설정 → Worker 설정 → 연결 확인
+
+[공통 설정]
+1. hosts 파일 설정
+```
+sudo tee -a /etc/hosts << 'EOF'
+175.45.204.12 jaeyeon-control
+101.79.17.249 jaeyeon-worker
+EOF
+```
+2. 패키지 업데이트 + slurm 설치
+```
+sudo apt update && sudo apt install -y slurmd slurm-client munge
+```
+3. MUNGE 키 생성 (control만)
+###### 키가 같아야만 통신 허용
+```
+sudo create-munge-key
+sudo chown munge:munge /etc/munge/munge.key
+sudo chmod 400 /etc/munge/munge.key
+
+# worker에 같은 키 복사
+sudo scp -i ./jaeyeon-key.pem /etc/munge/munge.key root@101.79.17.249:/etc/munge/munge.key
+```
+
 
 ##### References
 ▸ https://supercomputing.tue.nl/documentation/steps/jobs/
