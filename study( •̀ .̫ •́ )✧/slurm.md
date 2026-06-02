@@ -80,7 +80,7 @@ EOF
 ```
 sudo apt update && sudo apt install -y slurmd slurm-client munge
 ```
-3. MUNGE 키 생성 (control만)
+3. MUNGE 키 생성 (control)
 ###### 키가 같아야만 통신 허용
 ```
 sudo create-munge-key
@@ -89,8 +89,43 @@ sudo chmod 400 /etc/munge/munge.key
 
 # worker에 같은 키 복사
 sudo scp -i ./jaeyeon-key.pem /etc/munge/munge.key root@101.79.17.249:/etc/munge/munge.key
+# (worker)
+sudo chown munge:munge /etc/munge/munge.key
+sudo chmod 400 /etc/munge/munge.key
+```
+4. 두 서버 모두 munge 시작
+```
+sudo systemctl enable munge
+sudo systemctl start munge
+sudo systemctl status munge
 ```
 
+[Control]
+1. slurm.conf 설정
+```
+sudo tee /etc/slurm/slurm.conf << 'EOF'
+ClusterName=jaeyeon-cluster
+SlurmctldHost=jaeyeon-control
+MpiDefault=none
+ProctrackType=proctrack/linuxproc
+ReturnToService=2
+SlurmctldPidFile=/var/run/slurmctld.pid
+SlurmdPidFile=/var/run/slurmd.pid
+SlurmdSpoolDir=/var/spool/slurmd
+SlurmctldLogFile=/var/log/slurmctld.log
+SlurmdLogFile=/var/log/slurmd.log
+StateSaveLocation=/var/spool/slurmctld
+
+SchedulerType=sched/backfill
+SelectType=select/cons_tres
+
+AccountingStorageType=accounting_storage/none
+JobAcctGatherType=jobacct_gather/none
+
+NodeName=jaeyeon-worker CPUs=2 RealMemory=3800 State=UNKNOWN
+PartitionName=debug Nodes=jaeyeon-worker Default=YES MaxTime=INFINITE State=UP
+EOF
+```
 
 ##### References
 ▸ https://supercomputing.tue.nl/documentation/steps/jobs/
