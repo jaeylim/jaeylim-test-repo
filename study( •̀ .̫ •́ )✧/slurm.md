@@ -13,9 +13,9 @@
 ```
 [사용자] → sbatch 제출
               ↓
-         [slurmctld]  ← 마스터 데몬 (컨트롤 노드에서 실행)
+         [slurmctld]  ← 마스터 데몬 (Control Node)
               ↓
-         [slurmd]     ← 각 워커 노드에서 실행되는 데몬
+         [slurmd]     ← 데몬 (Worker Node)
               ↓
          [실제 작업 실행]
 ```
