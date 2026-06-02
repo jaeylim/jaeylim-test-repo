@@ -21,6 +21,26 @@
          [실제 작업 실행]
 ```
 
+##### sbatch (스크립트)
+실제로 job을 어떻게 제출하는지.
+EX> sbatch job.sh
+```
+#!/bin/bash
+#SBATCH --job-name=myjob      # job 이름 (squeue에서 보임)
+#SBATCH --partition=gpu        # 어떤 파티션에서 실행할지
+#SBATCH --nodes=1              # 노드 몇 대 쓸지
+#SBATCH --ntasks=1             # 태스크 몇 개 (프로세스 수)
+#SBATCH --cpus-per-task=4      # 태스크당 CPU 코어 수
+#SBATCH --gres=gpu:1           # GPU 몇 개
+#SBATCH --mem=16G              # 메모리
+#SBATCH --time=02:00:00        # 최대 실행시간 (초과하면 강제종료)
+#SBATCH --output=log_%j.out    # 표준출력 저장 파일 (%j = job ID)
+#SBATCH --error=err_%j.err     # 에러출력 저장 파일
+
+python train.py                # 실제 실행할 명령어
+```
+
+
 ##### Kubernetes와 차이점
 🗒️ Kube와 차이점은 작업 단위 `Kubernetes (Pod), Slurm(Job)`외에도 다음과 같다.
 
