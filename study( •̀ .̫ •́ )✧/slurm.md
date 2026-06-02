@@ -126,6 +126,25 @@ NodeName=jaeyeon-worker CPUs=2 RealMemory=3800 State=UNKNOWN
 PartitionName=debug Nodes=jaeyeon-worker Default=YES MaxTime=INFINITE State=UP
 EOF
 ```
+2. worker에도 복사
+```
+sudo scp -i ./jaeyeon-key.pem /etc/slurm/slurm.conf root@101.79.17.249:/etc/slurm/slurm.conf
+```
+
+[Slurm]
+1. (control)
+```
+sudo systemctl enable slurmctld
+sudo systemctl start slurmctld
+sudo systemctl status slurmctld
+```
+2. (worker)
+```
+sudo systemctl enable slurmd
+sudo systemctl start slurmd
+sudo systemctl status slurmd
+```
+
 
 ##### References
 ▸ https://supercomputing.tue.nl/documentation/steps/jobs/
