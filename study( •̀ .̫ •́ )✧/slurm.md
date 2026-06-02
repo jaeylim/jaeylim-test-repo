@@ -1,4 +1,3 @@
-#### slurm
 ##### SLURM (Simple Linux Utility for Resource Management)
 
 → 여러 컴퓨터(노드)를 묶어서 작업을 공정하게 분배해주는 스케줄러.
