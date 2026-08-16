@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cicd-test-app
+  namespace: cicd-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cicd-test-app
+  template:
+    metadata:
+      labels:
+        app: cicd-test-app
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: cicd-test-app
+        image: ghcr.io/jaeylim/jaeylim-test-repo:v1
+        ports:
+        - containerPort: 80
