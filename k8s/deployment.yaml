@@ -17,6 +17,6 @@ spec:
       - name: ghcr-secret
       containers:
       - name: cicd-test-app
-        image: ghcr.io/jaeylim/jaeylim-test-repo:v2
+        image: ghcr.io/jaeylim/jaeylim-test-repo:v99
         ports:
         - containerPort: 80
