@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'docker:24-dind'
+            image 'docker:24-cli'
             args '-v /run/podman/podman.sock:/var/run/docker.sock --privileged'
         }
     }
