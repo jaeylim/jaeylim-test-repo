@@ -1,9 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:24-dind'
+            args '-v /run/podman/podman.sock:/var/run/docker.sock --privileged'
+        }
+    }
 
     environment {
         IMAGE_NAME = "ghcr.io/jaeylim/jaeylim-test-repo"
-        IMAGE_TAG = "jenkins-test"
+        IMAGE_TAG = "jenkins-agent-test"
     }
 
     stages {
